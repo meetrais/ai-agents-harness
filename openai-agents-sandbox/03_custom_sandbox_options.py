@@ -10,7 +10,7 @@ import asyncio
 
 from docker import from_env as docker_from_env
 
-from agents import Runner
+from agents import ModelSettings, Runner
 from agents.run import RunConfig
 from agents.sandbox import Manifest, SandboxAgent, SandboxRunConfig
 from agents.sandbox.capabilities import Shell
@@ -20,6 +20,8 @@ from agents.sandbox.sandboxes.docker import (
     DockerSandboxClient,
     DockerSandboxClientOptions,
 )
+
+from progress import Spinner
 
 manifest = Manifest(
     entries={
@@ -43,6 +45,7 @@ manifest = Manifest(
 agent = SandboxAgent(
     name="Docker Sandbox Analyst",
     model="gpt-5.4",
+    model_settings=ModelSettings(reasoning={"effort": "none"}),
     instructions=(
         "Review the workspace before answering. "
         "Keep the response concise and cite file names."
@@ -53,19 +56,20 @@ agent = SandboxAgent(
 
 
 async def main():
-    result = await Runner.run(
-        agent,
-        "Summarize the blockers and recommend next actions.",
-        run_config=RunConfig(
-            sandbox=SandboxRunConfig(
-                client=DockerSandboxClient(docker_from_env()),
-                options=DockerSandboxClientOptions(
-                    image=DEFAULT_PYTHON_SANDBOX_IMAGE,
+    async with Spinner("Docker Sandbox Analyst reviewing blockers"):
+        result = await Runner.run(
+            agent,
+            "Summarize the blockers and recommend next actions.",
+            run_config=RunConfig(
+                sandbox=SandboxRunConfig(
+                    client=DockerSandboxClient(docker_from_env()),
+                    options=DockerSandboxClientOptions(
+                        image=DEFAULT_PYTHON_SANDBOX_IMAGE,
+                    ),
                 ),
+                workflow_name="Docker sandbox review",
             ),
-            workflow_name="Docker sandbox review",
-        ),
-    )
+        )
     print(result.final_output)
 
 

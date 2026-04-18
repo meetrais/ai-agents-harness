@@ -12,47 +12,50 @@ Requires: Docker Desktop running.
 """
 
 import asyncio
-import tempfile
-from pathlib import Path
 
 from docker import from_env as docker_from_env
 
-from agents import Runner
+from agents import ModelSettings, Runner
 from agents.run import RunConfig
 from agents.sandbox import Manifest, SandboxAgent, SandboxRunConfig
 from agents.sandbox.capabilities import Filesystem, Memory, Shell
-from agents.sandbox.entries import LocalDir
+from agents.sandbox.entries import File
 from agents.sandbox.sandboxes.docker import DockerSandboxClient, DockerSandboxClientOptions
+
+from progress import Spinner
+
+manifest = Manifest(
+    entries={
+        "data/risks.md": File(
+            content=(
+                b"# Delivery risks\n\n"
+                b"- Security questionnaire not complete.\n"
+                b"- Procurement needs final legal language by April 1.\n"
+            )
+        ),
+    }
+)
+
+agent = SandboxAgent(
+    name="Memory-enabled reviewer",
+    model="gpt-5.4",
+    model_settings=ModelSettings(reasoning={"effort": "none"}),
+    instructions=(
+        "Inspect the workspace and retain useful lessons "
+        "for follow-up runs."
+    ),
+    default_manifest=manifest,
+    capabilities=[Memory(), Filesystem(), Shell()],
+)
 
 
 async def main() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
-        dataroom = Path(tmp) / "dataroom"
-        dataroom.mkdir()
-        (dataroom / "risks.md").write_text(
-            """# Delivery risks
-
-- Security questionnaire not complete.
-- Procurement needs final legal language by April 1.
-""",
-            encoding="utf-8",
-        )
-
-        agent = SandboxAgent(
-            name="Memory-enabled reviewer",
-            model="gpt-5.4",
-            instructions=(
-                "Inspect the workspace and retain useful lessons "
-                "for follow-up runs."
-            ),
-            default_manifest=Manifest(entries={"data": LocalDir(src=dataroom)}),
-            capabilities=[Memory(), Filesystem(), Shell()],
-        )
-
+    async with Spinner("Memory-enabled reviewer analyzing risks"):
         result = await Runner.run(
             agent,
             "Review the workspace files and summarize the key risks. "
             "Store any lessons learned for future runs.",
+            max_turns=3,
             run_config=RunConfig(
                 sandbox=SandboxRunConfig(
                     client=DockerSandboxClient(docker_from_env()),
@@ -61,7 +64,7 @@ async def main() -> None:
             ),
         )
 
-        print(result.final_output)
+    print(result.final_output)
 
 
 if __name__ == "__main__":
