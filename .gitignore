@@ -191,6 +191,9 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Harness evaluation run history
+eval_runs/
+
 # PyPI configuration file
 .pypirc
 

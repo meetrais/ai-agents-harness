@@ -30,6 +30,7 @@ uv pip install -r requirements.txt
 | `05_skills_sandbox.py` | Mount a Git-based skill into the sandbox |
 | `06_multi_environment.py` | Dynamically swaps Sandbox Client backends based on `ENVIRONMENT` variable (local, staging, production) |
 | `07_sandbox_providers/` | Ready-to-use provider scripts tailored for Daytona, E2B, Modal, Cloudflare, Vercel, Blaxel, and Runloop |
+| `08_harness_eval_loop.py` | Runs the dataroom worker, evaluates it against success criteria, and appends JSONL history |
 
 ## Running
 
@@ -43,3 +44,11 @@ To run a multi-environment script:
 ```bash
 ENVIRONMENT=local uv run 06_multi_environment.py
 ```
+
+To run the lightweight harness evaluation loop:
+
+```bash
+uv run 08_harness_eval_loop.py
+```
+
+The evaluation loop records run history under `eval_runs/`, which is ignored by git.

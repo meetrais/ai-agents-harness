@@ -88,6 +88,7 @@ Explore the library of patterns available in the `openai-agents-harness/` direct
 | **Multi-Env Harness** | [06_multi_environment.py](./openai-agents-harness/06_multi_environment.py) |
 | **Custom Images** | [03_custom_sandbox_options.py](./openai-agents-harness/03_custom_sandbox_options.py) |
 | **Session Persistence**| [04_resume_session.py](./openai-agents-harness/04_resume_session.py) |
+| **Harness Eval Loop** | [08_harness_eval_loop.py](./openai-agents-harness/08_harness_eval_loop.py) |
 
 ### Running the Harness
 
