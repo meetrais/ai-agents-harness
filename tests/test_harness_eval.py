@@ -46,6 +46,22 @@ class HarnessEvalTests(unittest.TestCase):
         self.assertLess(result.score, 1.0)
         self.assertIn("revenue: fy2025 value missing or incorrect", result.failed_checks)
 
+    def test_swapped_metric_values_fail(self) -> None:
+        output = """
+        Source: metrics.md.
+        Revenue: FY2025 was 18.6M versus FY2024 at 12.4M,
+        up 6.2M, or 50%.
+        Operating income: FY2025 was 124.3M versus 98.7M,
+        up 25.6M, or 25.9%.
+        Operating cash flow: FY2025 was 24.1M versus 17.9M,
+        up 6.2M, or 34.6%.
+        """
+        result = evaluate_dataroom_output(output)
+
+        self.assertLess(result.score, 1.0)
+        self.assertIn("revenue: fy2025 value missing or incorrect", result.failed_checks)
+        self.assertIn("operating income: fy2025 value missing or incorrect", result.failed_checks)
+
     def test_missing_source_fails_with_note(self) -> None:
         output = PASSING_OUTPUT.replace("Using metrics.md only:", "Using the provided file only:")
         result = evaluate_dataroom_output(output)

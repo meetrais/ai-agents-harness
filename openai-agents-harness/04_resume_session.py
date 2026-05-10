@@ -47,10 +47,10 @@ async def main():
     client = DockerSandboxClient(docker_from_env())
     options = DockerSandboxClientOptions(image="python:3.14-slim")
 
-    # --- First run: build the initial version ---
+    # First run: build the initial version.
     session = await client.create(manifest=manifest, options=options)
     async with session:
-        async with Spinner("Iterative Builder — first run"):
+        async with Spinner("Iterative Builder - first run"):
             first_result = await Runner.run(
                 agent,
                 "Build the first version of the app.",
@@ -64,23 +64,22 @@ async def main():
     print("--- First run output ---")
     print(first_result.final_output)
 
-    # Freeze session state so we can resume later
+    # Freeze session state so we can resume later.
     conversation = first_result.to_input_list()
     frozen_session_state = client.deserialize_session_state(
         client.serialize_session_state(session.state)
     )
 
-    # Add a follow-up instruction
     conversation.append({
         "role": "user",
         "content": "Continue from the existing workspace and add tests.",
     })
 
-    # --- Second run: resume in the same workspace ---
+    # Second run: resume in the same workspace.
     resumed_session = await client.resume(frozen_session_state)
     try:
         async with resumed_session:
-            async with Spinner("Iterative Builder — resumed run"):
+            async with Spinner("Iterative Builder - resumed run"):
                 second_result = await Runner.run(
                     agent,
                     conversation,

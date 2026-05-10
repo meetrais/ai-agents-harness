@@ -86,17 +86,19 @@ def evaluate_dataroom_output(output: str, task: TaskDefinition = DATAROOM_TASK) 
     passed: list[str] = []
     failed: list[str] = []
     notes: list[str] = []
+    metric_sections = _metric_sections(output, task.expected_values)
 
     for metric_key, metric in task.expected_values.items():
         label = str(metric["label"])
-        if label.lower() in output.lower():
+        metric_text = metric_sections.get(metric_key, "")
+        if metric_text:
             passed.append(f"{label}: label present")
         else:
             failed.append(f"{label}: label missing")
 
         for field in ("fy2025", "fy2024", "delta", "pct"):
             expected = float(metric[field])
-            if _number_present(output, expected, percent=(field == "pct")):
+            if _number_present(metric_text, expected, percent=(field == "pct")):
                 passed.append(f"{label}: {field} value present")
             else:
                 failed.append(f"{label}: {field} value missing or incorrect")
@@ -163,6 +165,29 @@ def format_eval_report(result: EvalResult) -> str:
 def _number_present(text: str, expected: float, *, percent: bool) -> bool:
     candidates = _numeric_candidates(expected, percent=percent)
     return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in candidates)
+
+
+def _metric_sections(
+    text: str,
+    expected_values: dict[str, dict[str, float | str]],
+) -> dict[str, str]:
+    """Return the text region belonging to each metric label."""
+    labels = {
+        key: str(metric["label"]).lower()
+        for key, metric in expected_values.items()
+    }
+    matches: list[tuple[int, int, str]] = []
+    for key, label in labels.items():
+        match = re.search(re.escape(label), text, flags=re.IGNORECASE)
+        if match:
+            matches.append((match.start(), match.end(), key))
+
+    matches.sort()
+    sections: dict[str, str] = {}
+    for index, (start, _end, key) in enumerate(matches):
+        next_start = matches[index + 1][0] if index + 1 < len(matches) else len(text)
+        sections[key] = text[start:next_start]
+    return sections
 
 
 def _numeric_candidates(value: float, *, percent: bool) -> list[str]:

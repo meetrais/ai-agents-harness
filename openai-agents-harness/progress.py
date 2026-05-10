@@ -8,7 +8,7 @@ import time
 class Spinner:
     """Async context manager that displays a live spinner with elapsed time."""
 
-    FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    FRAMES = ["|", "/", "-", "\\"]
 
     def __init__(self, message: str = "Running agent"):
         self._message = message
@@ -29,7 +29,7 @@ class Spinner:
                 await asyncio.sleep(0.12)
         except asyncio.CancelledError:
             elapsed = time.time() - self._start
-            sys.stdout.write(f"\r✅ {self._message} — done in {elapsed:.1f}s\n")
+            sys.stdout.write(f"\r[done] {self._message} - done in {elapsed:.1f}s\n")
             sys.stdout.flush()
 
     async def __aenter__(self):
