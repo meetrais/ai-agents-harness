@@ -1,0 +1,36 @@
+{
+  "task_id": "dataroom_financials",
+  "instruction": "Compare FY2025 revenue, operating income, and operating cash flow with FY2024. For each metric, include the FY2025 value, FY2024 value, absolute change, and percentage change. Use only files in data/ and cite metrics.md.",
+  "data_dir": "dataroom",
+  "required_source": "metrics.md",
+  "expected_metrics": {
+    "revenue": {
+      "label": "revenue",
+      "fy2025": 124.3,
+      "fy2024": 98.7,
+      "delta": 25.6,
+      "pct": 25.9
+    },
+    "operating_income": {
+      "label": "operating income",
+      "fy2025": 18.6,
+      "fy2024": 12.4,
+      "delta": 6.2,
+      "pct": 50.0
+    },
+    "operating_cash_flow": {
+      "label": "operating cash flow",
+      "fy2025": 24.1,
+      "fy2024": 17.9,
+      "delta": 6.2,
+      "pct": 34.6
+    }
+  },
+  "disallowed_claims": [
+    "external source",
+    "web search",
+    "searched the web",
+    "according to the web",
+    "internet source"
+  ]
+}

@@ -8,6 +8,11 @@
 
 This repository provides a unified architecture for developing, testing, and deploying AI agents with isolated code execution capabilities. The **Harness Architecture** decouples agent business logic from infrastructure, enabling transitions from local development to production-style environments.
 
+It now includes two complementary tracks:
+
+- `openai-agents-harness/`: OpenAI Agents SDK sandbox examples.
+- `harness-engineering/`: framework-neutral Harness Engineering patterns for running, evaluating, tracing, and comparing agents across frameworks.
+
 ---
 
 ## Key Features
@@ -46,6 +51,7 @@ ai-agents-harness/
 |   |-- 01_... to 05_...    # Feature-specific demonstrations
 |   |-- 06_multi_environment.py
 |   `-- 07_sandbox_providers/
+|-- harness-engineering/    # Framework-neutral harness contracts and adapter sketches
 |-- dataroom/               # Local data directory for mounting
 `-- LICENSE                 # MIT License
 ```
@@ -89,6 +95,13 @@ Explore the library of patterns available in the `openai-agents-harness/` direct
 | **Custom Images** | [03_custom_sandbox_options.py](./openai-agents-harness/03_custom_sandbox_options.py) |
 | **Session Persistence** | [04_resume_session.py](./openai-agents-harness/04_resume_session.py) |
 | **Harness Eval Loop** | [08_harness_eval_loop.py](./openai-agents-harness/08_harness_eval_loop.py) |
+
+Explore framework-neutral Harness Engineering patterns in [harness-engineering/](./harness-engineering/):
+
+```bash
+python harness-engineering/run_harness.py run
+python harness-engineering/run_harness.py matrix
+```
 
 ### Running the Harness
 
